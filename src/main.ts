@@ -137,6 +137,7 @@ const DEFAULT_SETTINGS: RemotelySavePluginSettings = {
   syncConfigDir: false,
   syncBookmarks: false,
   syncUnderscoreItems: false,
+  syncDotAgentsDir: false,
   lang: "auto",
   logToDB: false,
   skipSizeLargerThan: -1,
@@ -1414,6 +1415,9 @@ export default class RemotelySavePlugin extends Plugin {
     }
     if (this.settings.onlyAllowPaths === undefined) {
       this.settings.onlyAllowPaths = [];
+    }
+    if (this.settings.syncDotAgentsDir === undefined) {
+      this.settings.syncDotAgentsDir = false;
     }
     if (this.settings.enableStatusBarInfo === undefined) {
       this.settings.enableStatusBarInfo = true;

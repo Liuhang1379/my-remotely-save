@@ -140,6 +140,10 @@ const isBookmarksFile = (x: string, configDir: string) => {
   );
 };
 
+const isInsideDotAgentsDir = (x: string) => {
+  return x.split("/").some((part) => part === ".agents");
+};
+
 interface IsSkipResult {
   enableAllowMode: boolean;
   isExplictlyAllowed: boolean;
@@ -154,7 +158,8 @@ export const checkIsSkipItemOrNotByName = (
   syncUnderscoreItems: boolean,
   configDir: string,
   ignorePaths: string[],
-  onlyAllowPaths: string[]
+  onlyAllowPaths: string[],
+  syncDotAgentsDir = false
 ): IsSkipResult => {
   if (key === undefined) {
     throw Error(`checkIsSkipItemOrNotByName meets undefinded key!`);
@@ -245,7 +250,8 @@ export const checkIsSkipItemOrNotByName = (
   }
 
   const checkIsHidden =
-    isHiddenPath(key, true, false) ||
+    (isHiddenPath(key, true, false) &&
+      !(syncDotAgentsDir && isInsideDotAgentsDir(key))) ||
     (!syncUnderscoreItems && isHiddenPath(key, false, true)) ||
     key === "/" ||
     key === DEFAULT_FILE_NAME_FOR_METADATAONREMOTE ||
@@ -365,6 +371,7 @@ const ensembleMixedEnties = async (
   syncBookmarks: boolean,
   configDir: string,
   syncUnderscoreItems: boolean,
+  syncDotAgentsDir: boolean,
   ignorePaths: string[],
   onlyAllowPaths: string[],
   fsEncrypt: FakeFsEncrypt,
@@ -398,7 +405,8 @@ const ensembleMixedEnties = async (
       syncUnderscoreItems,
       configDir,
       ignorePaths,
-      onlyAllowPaths
+      onlyAllowPaths,
+      syncDotAgentsDir
     );
     skipOrNotResults[key] = skipOrNot;
     if (skipOrNot.finalIsIgnored && !key.startsWith(configDir)) {
@@ -448,7 +456,8 @@ const ensembleMixedEnties = async (
           syncUnderscoreItems,
           configDir,
           ignorePaths,
-          onlyAllowPaths
+          onlyAllowPaths,
+          syncDotAgentsDir
         );
         skipOrNotResults[key] = skipOrNot;
       }
@@ -485,7 +494,8 @@ const ensembleMixedEnties = async (
         syncUnderscoreItems,
         configDir,
         ignorePaths,
-        onlyAllowPaths
+        onlyAllowPaths,
+        syncDotAgentsDir
       );
       skipOrNotResults[key] = skipOrNot;
     }
@@ -1215,6 +1225,7 @@ const getSyncPlanInplace = async (
       syncConfigDir: settings.syncConfigDir,
       syncBookmarks: settings.syncBookmarks,
       syncUnderscoreItems: settings.syncUnderscoreItems,
+      syncDotAgentsDir: settings.syncDotAgentsDir,
       skipSizeLargerThan: settings.skipSizeLargerThan,
       protectModifyPercentage: settings.protectModifyPercentage,
       conflictAction: conflictAction,
@@ -2008,6 +2019,7 @@ export async function syncer(
       settings.syncBookmarks ?? false,
       configDir,
       settings.syncUnderscoreItems ?? false,
+      settings.syncDotAgentsDir ?? false,
       settings.ignorePaths ?? [],
       settings.onlyAllowPaths ?? [],
       fsEncrypt,

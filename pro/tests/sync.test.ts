@@ -151,4 +151,41 @@ describe("Sync: checkIsSkipItemOrNotByName", () => {
     ).finalIsIgnored;
     assert.ok(isSkip);
   });
+
+  it("should allow .agents folders only when explicitly enabled", async () => {
+    let isSkip = checkIsSkipItemOrNotByName(
+      "project/.agents/skills/example/SKILL.md",
+      false,
+      false,
+      false,
+      ".obsidian",
+      /*    ignorePaths */ [],
+      /* onlyAllowPaths */ []
+    ).finalIsIgnored;
+    assert.ok(isSkip);
+
+    isSkip = checkIsSkipItemOrNotByName(
+      "project/.agents/skills/example/SKILL.md",
+      false,
+      false,
+      false,
+      ".obsidian",
+      /*    ignorePaths */ [],
+      /* onlyAllowPaths */ [],
+      true
+    ).finalIsIgnored;
+    assert.ok(!isSkip);
+
+    isSkip = checkIsSkipItemOrNotByName(
+      "project/.git/config",
+      false,
+      false,
+      false,
+      ".obsidian",
+      /*    ignorePaths */ [],
+      /* onlyAllowPaths */ [],
+      true
+    ).finalIsIgnored;
+    assert.ok(isSkip);
+  });
 });
